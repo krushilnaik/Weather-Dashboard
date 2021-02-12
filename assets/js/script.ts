@@ -29,9 +29,6 @@ searchButton.addEventListener("click", function() {
 	var initialRequestURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}`;
 	console.log(initialRequestURL);
 
-	// var requestURL = `https://api.openweathermap.org/data/2.5/forecast/daily?q=${cityName}&appid=${API_KEY}&units=imperial`;
-	// console.log(initialRequestURL);
-
 	var ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall";
 
 	var iconBaseURL = "http://openweathermap.org/img/w";
