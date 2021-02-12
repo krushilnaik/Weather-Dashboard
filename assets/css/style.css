@@ -43,8 +43,24 @@ section {
 	height: 100%;
 }
 
+button:hover {
+	cursor: pointer;
+}
+
 #search-section {
 	background-color: #dddddd;
+}
+
+#search-icon {
+	background-color: dodgerblue;
+	border: none;
+	color: white;
+	border-radius: 5px;
+	height: 100%;
+}
+
+#search-bar {
+	margin-top: 5%;
 }
 
 input[type="text"] {

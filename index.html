@@ -7,6 +7,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Weather Dashboard</title>
 
+		<!-- External CSS -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+		<!-- Internal CSS -->
 		<link rel="stylesheet" href="assets/css/style.css">
 	</head>
 
@@ -18,12 +22,24 @@
 		<main>
 			<section id="search-section">
 				<h2>Search for a City:</h2>
-				<input type="text" name="search" id="search-field">
+				<div id="search-bar">
+					<input type="text" name="search-field" id="search-field">
+					<button id="search-icon">
+						<i class="fa fa-search" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div id="search-history"></div>
 			</section>
 			<section id="weather-info">
-				<div id="weather-card"></div>
+				<div id="weather-card">
+					<h1 id="city">Atlanta</h1>
+					<div id="current-temperature">Temperature:</div>
+					<div id="current-humidity">Humidity</div>
+					<div id="current-wind">Wind Speed</div>
+					<div id="current-uv">UV Index</div>
+				</div>
 				<div id="forecast">
-					<h1>5-Day Forecast</h1>
+					<h2>5-Day Forecast:</h2>
 					<div class="forecast-cards">
 						<div class="card">Day 1</div>
 						<div class="card">Day 2</div>
@@ -34,7 +50,9 @@
 				</div>
 			</section>
 		</main>
-		<script src=""></script>
+
+		<!-- Internal JavaScript -->
+		<script src="assets/js/dist/script.js"></script>
 	</body>
 
 </html>
