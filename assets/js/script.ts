@@ -2,10 +2,17 @@
 var searchButton = document.querySelector("button");
 var searchField = document.querySelector("input");
 
+interface DayWeatherModel {
+	dt: number;
+	wind_speed: number;
+	uvi: number;
+	humidity: number;
+	weather: {icon: string; description: string;};
+}
+
 interface ResponseModel {
-	list: Object[];
-	city: Object;
-	cod: number;
+	current: DayWeatherModel;
+	daily: DayWeatherModel[];
 }
 
 const API_KEY = "81e9f56d1663d1d6f860c7b97883e905";
