@@ -1,4 +1,3 @@
-// api.openweathermap.org/data/2.5/forecast?q={city name}&appid=81e9f56d1663d1d6f860c7b97883e905
 var searchButton = document.querySelector("button");
 var searchField = document.querySelector("input");
 
@@ -25,6 +24,9 @@ interface ResponseModel {
 }
 
 const API_KEY = "81e9f56d1663d1d6f860c7b97883e905";
+const ONE_CALL = `https://api.openweathermap.org/data/2.5/onecall?appid=${API_KEY}`;
+const WEATHER = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&exclude=hourly,minutely,alerts&units=imperial`;
+const ICON = "http://openweathermap.org/img/w";
 
 function toDateString(unixTime: number) {
 	return (new Date(unixTime * 1000)).toLocaleDateString();
@@ -32,20 +34,14 @@ function toDateString(unixTime: number) {
 
 searchButton.addEventListener("click", function() {
 	const query = searchField.value;
-	console.log(`Requested data for city '${query}'`);
 
-	var initialRequestURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}`;
-
-	var ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall";
-
-	var iconBaseURL = "http://openweathermap.org/img/w";
 	let cityName: string;
 
 	// The UV Index is only found in the One Call API
 	// which uses lat and lon instead of city name
 	// for now, fetch those separately via arbitrary API
 	// and pass those into the "main" fetch
-	fetch(initialRequestURL).then(
+	fetch(`${WEATHER}&q=${query}`).then(
 		response => response.json()
 	).then(
 		data => {
@@ -54,7 +50,7 @@ searchButton.addEventListener("click", function() {
 		}
 	).then (
 		coords => {
-			fetch(`${ONE_CALL}?lat=${coords[0]}&lon=${coords[1]}&exclude=hourly,minutely,alerts&units=imperial&appid=${API_KEY}`).then(
+			fetch(`${ONE_CALL}&lat=${coords[0]}&lon=${coords[1]}`).then(
 				response => response.json()
 			).then(
 				data => {
@@ -80,6 +76,9 @@ searchButton.addEventListener("click", function() {
 
 					var currentUVIndexSpan: HTMLSpanElement = currentUVIndex.querySelector("span");
 
+					// Add a background color to the UV Index
+					// based on where in the range (defined in 'uvColors')
+					// the numberical value falls
 					for (const [bound, color] of Object.entries(uvColors)) {
 						let [lower, upper] = bound.split("-").map(_x => Number(_x));
 
@@ -91,14 +90,14 @@ searchButton.addEventListener("click", function() {
 						currentUVIndexSpan.style.backgroundColor = "purple";
 					}
 
-					headerRow.innerHTML += `<img src="${iconBaseURL}/${current.weather[0].icon}.png" alt="${current.weather[0].description}">`;
+					headerRow.innerHTML += `<img src="${ICON}/${current.weather[0].icon}.png" alt="${current.weather[0].description}">`;
 
 					for (let i = 0; i < cards.length; i++) {
 						const currentCard = dailyWeather[i+1];
 
 						cards[i].innerHTML = `
 							<div class="forecast-date">${toDateString(currentCard.dt)}</div>
-							<img src="${iconBaseURL}/${currentCard.weather[0].icon}.png" alt="${current.weather[0].description}">
+							<img src="${ICON}/${currentCard.weather[0].icon}.png" alt="${current.weather[0].description}">
 							<div>Temp: ${currentCard.temp.day} °F</div>
 							<div>Humidity: ${currentCard.humidity}%</div>
 						`;
