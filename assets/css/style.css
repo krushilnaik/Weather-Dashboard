@@ -94,12 +94,29 @@ input[type="text"] {
 .card {
 	background-color: dodgerblue;
 	border-radius: 7px;
-	height: 190px;
+	height: 165px;
 	padding: 5%;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
+	justify-content: space-evenly;
 	font-size: .8em;
 	color: white;
 	font-weight: 500;
 }
+
+[id^="current-"] {
+	font-size: 16px;
+}
+
+.header-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.forecast-date {
+	font-size: 20px;
+}
+	.forecast-date ~ * {
+		font-size: 14px;
+		font-weight: normal;
+	}
