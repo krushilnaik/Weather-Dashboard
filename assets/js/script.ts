@@ -3,12 +3,12 @@ var searchButton = document.querySelector("button");
 var searchField = document.querySelector("input");
 
 var cards = document.querySelectorAll(".card");
-var headerRow = document.querySelector(".header-row");
-var currentCity = document.querySelector("#city");
-var currentTemperature = document.querySelector("#current-temperature");
-var currentHumidity = document.querySelector("#current-humidity");
-var currentWind = document.querySelector("#current-wind");
-var currentUVIndex = document.querySelector("#current-uv");
+var headerRow: HTMLElement = document.querySelector(".header-row");
+var currentCity: HTMLElement = document.querySelector("#city");
+var currentTemperature: HTMLElement = document.querySelector("#current-temperature");
+var currentHumidity: HTMLElement = document.querySelector("#current-humidity");
+var currentWind: HTMLElement = document.querySelector("#current-wind");
+var currentUVIndex: HTMLElement = document.querySelector("#current-uv");
 
 interface DayWeatherModel {
 	dt: number;
@@ -62,23 +62,43 @@ searchButton.addEventListener("click", function() {
 					// solely for better code completion
 					let _data: ResponseModel = data;
 
-					let currentWeather = _data.current;
+					const uvColors = {
+						"8-10" : "violet",
+						"6-7" : "red",
+						"3-5" : "gold",
+						"0-2" : "green"
+					};
+
+					let current = _data.current;
 					let dailyWeather = _data.daily;
 
-					currentCity.innerHTML = `${cityName} (${toDateString(currentWeather.dt)})`;
-					currentTemperature.innerHTML = `Temperature: ${currentWeather.temp} °F`;
-					currentHumidity.innerHTML = `Humidity: ${currentWeather.humidity}%`;
-					currentWind.innerHTML = `Wind Speed: ${currentWeather.wind_speed} MPH`;
-					currentUVIndex.innerHTML = `UV Index: ${currentWeather.uvi.toLocaleString()}`;
+					currentCity.innerHTML = `${cityName} (${toDateString(current.dt)})`;
+					currentTemperature.innerHTML = `Temperature: ${current.temp} °F`;
+					currentHumidity.innerHTML = `Humidity: ${current.humidity}%`;
+					currentWind.innerHTML = `Wind Speed: ${current.wind_speed} MPH`;
+					currentUVIndex.innerHTML = `UV Index: <span class="${"extreme"}">${current.uvi}</span>`;
 
-					headerRow.innerHTML += `<img src="${iconBaseURL}/${currentWeather.weather[0].icon}.png" alt="${currentWeather.weather[0].description}">`;
+					var currentUVIndexSpan: HTMLSpanElement = currentUVIndex.querySelector("span");
+
+					for (const [bound, color] of Object.entries(uvColors)) {
+						let [lower, upper] = bound.split("-").map(_x => Number(_x));
+
+						if (lower < current.uvi && current.uvi < upper) {
+							currentUVIndexSpan.style.backgroundColor = color;
+							break;
+						}
+
+						currentUVIndexSpan.style.backgroundColor = "purple";
+					}
+
+					headerRow.innerHTML += `<img src="${iconBaseURL}/${current.weather[0].icon}.png" alt="${current.weather[0].description}">`;
 
 					for (let i = 0; i < cards.length; i++) {
 						const currentCard = dailyWeather[i+1];
 
 						cards[i].innerHTML = `
 							<div class="forecast-date">${toDateString(currentCard.dt)}</div>
-							<img src="${iconBaseURL}/${currentCard.weather[0].icon}.png" alt="${currentWeather.weather[0].description}">
+							<img src="${iconBaseURL}/${currentCard.weather[0].icon}.png" alt="${current.weather[0].description}">
 							<div>Temp: ${currentCard.temp.day} °F</div>
 							<div>Humidity: ${currentCard.humidity}%</div>
 						`;
