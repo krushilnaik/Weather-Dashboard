@@ -32,10 +32,9 @@ function toDateString(unixTime: number) {
 
 searchButton.addEventListener("click", function() {
 	const query = searchField.value;
-	// console.log(`Requested data for city '${query}'`);
+	console.log(`Requested data for city '${query}'`);
 
 	var initialRequestURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}`;
-	// console.log(initialRequestURL);
 
 	var ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall";
 
