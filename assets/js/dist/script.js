@@ -31,17 +31,33 @@ searchButton.addEventListener("click", function () {
             // set up an expected structure for the parsed JSON
             // solely for better code completion
             var _data = data;
-            var currentWeather = _data.current;
+            var uvColors = {
+                "8-10": "violet",
+                "6-7": "red",
+                "3-5": "gold",
+                "0-2": "green"
+            };
+            var current = _data.current;
             var dailyWeather = _data.daily;
-            currentCity.innerHTML = cityName + " (" + toDateString(currentWeather.dt) + ")";
-            currentTemperature.innerHTML = "Temperature: " + currentWeather.temp + " \u00B0F";
-            currentHumidity.innerHTML = "Humidity: " + currentWeather.humidity + "%";
-            currentWind.innerHTML = "Wind Speed: " + currentWeather.wind_speed + " MPH";
-            currentUVIndex.innerHTML = "UV Index: " + currentWeather.uvi.toLocaleString();
-            headerRow.innerHTML += "<img src=\"" + iconBaseURL + "/" + currentWeather.weather[0].icon + ".png\" alt=\"" + currentWeather.weather[0].description + "\">";
+            currentCity.innerHTML = cityName + " (" + toDateString(current.dt) + ")";
+            currentTemperature.innerHTML = "Temperature: " + current.temp + " \u00B0F";
+            currentHumidity.innerHTML = "Humidity: " + current.humidity + "%";
+            currentWind.innerHTML = "Wind Speed: " + current.wind_speed + " MPH";
+            currentUVIndex.innerHTML = "UV Index: <span class=\"" + "extreme" + "\">" + current.uvi + "</span>";
+            var currentUVIndexSpan = currentUVIndex.querySelector("span");
+            for (var _i = 0, _a = Object.entries(uvColors); _i < _a.length; _i++) {
+                var _b = _a[_i], bound = _b[0], color = _b[1];
+                var _c = bound.split("-").map(function (_x) { return Number(_x); }), lower = _c[0], upper = _c[1];
+                if (lower < current.uvi && current.uvi < upper) {
+                    currentUVIndexSpan.style.backgroundColor = color;
+                    break;
+                }
+                currentUVIndexSpan.style.backgroundColor = "purple";
+            }
+            headerRow.innerHTML += "<img src=\"" + iconBaseURL + "/" + current.weather[0].icon + ".png\" alt=\"" + current.weather[0].description + "\">";
             for (var i = 0; i < cards.length; i++) {
                 var currentCard = dailyWeather[i + 1];
-                cards[i].innerHTML = "\n\t\t\t\t\t\t\t<div class=\"forecast-date\">" + toDateString(currentCard.dt) + "</div>\n\t\t\t\t\t\t\t<img src=\"" + iconBaseURL + "/" + currentCard.weather[0].icon + ".png\" alt=\"" + currentWeather.weather[0].description + "\">\n\t\t\t\t\t\t\t<div>Temp: " + currentCard.temp.day + " \u00B0F</div>\n\t\t\t\t\t\t\t<div>Humidity: " + currentCard.humidity + "%</div>\n\t\t\t\t\t\t";
+                cards[i].innerHTML = "\n\t\t\t\t\t\t\t<div class=\"forecast-date\">" + toDateString(currentCard.dt) + "</div>\n\t\t\t\t\t\t\t<img src=\"" + iconBaseURL + "/" + currentCard.weather[0].icon + ".png\" alt=\"" + current.weather[0].description + "\">\n\t\t\t\t\t\t\t<div>Temp: " + currentCard.temp.day + " \u00B0F</div>\n\t\t\t\t\t\t\t<div>Humidity: " + currentCard.humidity + "%</div>\n\t\t\t\t\t\t";
             }
         });
     });
