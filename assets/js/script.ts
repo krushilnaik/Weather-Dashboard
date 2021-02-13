@@ -2,6 +2,14 @@
 var searchButton = document.querySelector("button");
 var searchField = document.querySelector("input");
 
+var cards = document.querySelectorAll(".card");
+var headerRow = document.querySelector(".header-row");
+var currentCity = document.querySelector("#city");
+var currentTemperature = document.querySelector("#current-temperature");
+var currentHumidity = document.querySelector("#current-humidity");
+var currentWind = document.querySelector("#current-wind");
+var currentUVIndex = document.querySelector("#current-uv");
+
 interface DayWeatherModel {
 	dt: number;
 	wind_speed: number;
@@ -24,10 +32,10 @@ function toDateString(unixTime: number) {
 
 searchButton.addEventListener("click", function() {
 	const query = searchField.value;
-	console.log(`Requested data for city '${query}'`);
+	// console.log(`Requested data for city '${query}'`);
 
 	var initialRequestURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}`;
-	console.log(initialRequestURL);
+	// console.log(initialRequestURL);
 
 	var ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall";
 
@@ -47,7 +55,7 @@ searchButton.addEventListener("click", function() {
 		}
 	).then (
 		coords => {
-			fetch(ONE_CALL + `?lat=${coords[0]}&lon=${coords[1]}&exclude=hourly,minutely,alerts&units=imperial&appid=${API_KEY}`).then(
+			fetch(`${ONE_CALL}?lat=${coords[0]}&lon=${coords[1]}&exclude=hourly,minutely,alerts&units=imperial&appid=${API_KEY}`).then(
 				response => response.json()
 			).then(
 				data => {
@@ -55,30 +63,22 @@ searchButton.addEventListener("click", function() {
 					// solely for better code completion
 					let _data: ResponseModel = data;
 
-					console.log(cityName);
-					
-
 					let currentWeather = _data.current;
 					let dailyWeather = _data.daily;
 
-					let cards = document.querySelectorAll(".card");
-					let currentCity = document.querySelector("#city");
-					let currentTemperature = document.querySelector("#current-temperature");
-					let currentHumidity = document.querySelector("#current-humidity");
-					let currentWind = document.querySelector("#current-wind");
-					let currentUVIndex = document.querySelector("#current-uv");
-
 					currentCity.innerHTML = `${cityName} (${toDateString(currentWeather.dt)})`;
-					currentTemperature.innerHTML = `${currentWeather.temp} °F`;
-					currentHumidity.innerHTML = `${currentWeather.humidity}%`;
-					currentWind.innerHTML = `${currentWeather.wind_speed} MPH`;
-					currentUVIndex.innerHTML = currentWeather.uvi.toLocaleString();
+					currentTemperature.innerHTML = `Temperature: ${currentWeather.temp} °F`;
+					currentHumidity.innerHTML = `Humidity: ${currentWeather.humidity}%`;
+					currentWind.innerHTML = `Wind Speed: ${currentWeather.wind_speed} MPH`;
+					currentUVIndex.innerHTML = `UV Index: ${currentWeather.uvi.toLocaleString()}`;
+
+					headerRow.innerHTML += `<img src="${iconBaseURL}/${currentWeather.weather[0].icon}.png" alt="${currentWeather.weather[0].description}">`;
 
 					for (let i = 0; i < cards.length; i++) {
 						const currentCard = dailyWeather[i+1];
 
 						cards[i].innerHTML = `
-							<div>${toDateString(currentCard.dt)}</div>
+							<div class="forecast-date">${toDateString(currentCard.dt)}</div>
 							<img src="${iconBaseURL}/${currentCard.weather[0].icon}.png" alt="${currentWeather.weather[0].description}">
 							<div>Temp: ${currentCard.temp.day} °F</div>
 							<div>Humidity: ${currentCard.humidity}%</div>
