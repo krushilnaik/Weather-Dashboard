@@ -8,6 +8,7 @@ var currentTemperature: HTMLElement = document.querySelector("#current-temperatu
 var currentHumidity: HTMLElement = document.querySelector("#current-humidity");
 var currentWind: HTMLElement = document.querySelector("#current-wind");
 var currentUVIndex: HTMLElement = document.querySelector("#current-uv");
+var searchHistoryElement: HTMLElement = document.querySelector("#search-history");
 
 interface DayWeatherModel {
 	dt: number;
@@ -24,12 +25,42 @@ interface ResponseModel {
 }
 
 const API_KEY = "81e9f56d1663d1d6f860c7b97883e905";
-const ONE_CALL = `https://api.openweathermap.org/data/2.5/onecall?appid=${API_KEY}`;
-const WEATHER = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}&exclude=hourly,minutely,alerts&units=imperial`;
+const ONE_CALL = `https://api.openweathermap.org/data/2.5/onecall?appid=${API_KEY}&exclude=hourly,minutely,alerts&units=imperial`;
+const WEATHER = `https://api.openweathermap.org/data/2.5/weather?appid=${API_KEY}`;
 const ICON = "http://openweathermap.org/img/w";
 
+
+/**
+ * Convert UNIX time to a human-readable format
+ * @param unixTime the UNIX integer representation of time
+ */
 function toDateString(unixTime: number) {
 	return (new Date(unixTime * 1000)).toLocaleDateString();
+}
+
+/**
+ * Build a list of cities the user has previous searched for
+ * and put then on the left side of the screen, under the search bar
+ */
+function renderSearchHistory() {
+	searchHistoryElement.innerHTML = "";
+	const searchHistoryString = localStorage.getItem("searchHistory");
+
+	if (searchHistoryString === null) {
+		return;
+	}
+
+	for (const city of searchHistoryString.split("|").reverse()) {
+		if (city === "undefined") {
+			continue;
+		}
+
+		let entry = document.createElement("div");
+		entry.className = "history-item";
+		entry.innerText = city;
+
+		searchHistoryElement.appendChild(entry);
+	}
 }
 
 searchButton.addEventListener("click", function() {
@@ -46,6 +77,19 @@ searchButton.addEventListener("click", function() {
 	).then(
 		data => {
 			cityName = data.name;
+
+			var searchHistoryString = localStorage.getItem("searchHistory");
+
+			if (searchHistoryString) {
+				searchHistoryString += "|" + cityName;
+			} else {
+				searchHistoryString = cityName;
+			}
+
+			localStorage.setItem("searchHistory", searchHistoryString);
+
+			renderSearchHistory();
+
 			return [data.coord.lat, data.coord.lon];
 		}
 	).then (
@@ -107,3 +151,10 @@ searchButton.addEventListener("click", function() {
 		}
 	);
 });
+
+
+
+/**
+ * Load the page
+ */
+renderSearchHistory();

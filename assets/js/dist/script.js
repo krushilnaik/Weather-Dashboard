@@ -7,12 +7,38 @@ var currentTemperature = document.querySelector("#current-temperature");
 var currentHumidity = document.querySelector("#current-humidity");
 var currentWind = document.querySelector("#current-wind");
 var currentUVIndex = document.querySelector("#current-uv");
+var searchHistoryElement = document.querySelector("#search-history");
 var API_KEY = "81e9f56d1663d1d6f860c7b97883e905";
-var ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall?appid=" + API_KEY;
-var WEATHER = "https://api.openweathermap.org/data/2.5/weather?appid=" + API_KEY + "&exclude=hourly,minutely,alerts&units=imperial";
+var ONE_CALL = "https://api.openweathermap.org/data/2.5/onecall?appid=" + API_KEY + "&exclude=hourly,minutely,alerts&units=imperial";
+var WEATHER = "https://api.openweathermap.org/data/2.5/weather?appid=" + API_KEY;
 var ICON = "http://openweathermap.org/img/w";
+/**
+ * Convert UNIX time to a human-readable format
+ * @param unixTime the UNIX integer representation of time
+ */
 function toDateString(unixTime) {
     return (new Date(unixTime * 1000)).toLocaleDateString();
+}
+/**
+ * Build a list of cities the user has previous searched for
+ * and put then on the left side of the screen, under the search bar
+ */
+function renderSearchHistory() {
+    searchHistoryElement.innerHTML = "";
+    var searchHistoryString = localStorage.getItem("searchHistory");
+    if (searchHistoryString === null) {
+        return;
+    }
+    for (var _i = 0, _a = searchHistoryString.split("|").reverse(); _i < _a.length; _i++) {
+        var city = _a[_i];
+        if (city === "undefined") {
+            continue;
+        }
+        var entry = document.createElement("div");
+        entry.className = "history-item";
+        entry.innerText = city;
+        searchHistoryElement.appendChild(entry);
+    }
 }
 searchButton.addEventListener("click", function () {
     var query = searchField.value;
@@ -23,6 +49,15 @@ searchButton.addEventListener("click", function () {
     // and pass those into the "main" fetch
     fetch(WEATHER + "&q=" + query).then(function (response) { return response.json(); }).then(function (data) {
         cityName = data.name;
+        var searchHistoryString = localStorage.getItem("searchHistory");
+        if (searchHistoryString) {
+            searchHistoryString += "|" + cityName;
+        }
+        else {
+            searchHistoryString = cityName;
+        }
+        localStorage.setItem("searchHistory", searchHistoryString);
+        renderSearchHistory();
         return [data.coord.lat, data.coord.lon];
     }).then(function (coords) {
         fetch(ONE_CALL + "&lat=" + coords[0] + "&lon=" + coords[1]).then(function (response) { return response.json(); }).then(function (data) {
@@ -58,8 +93,12 @@ searchButton.addEventListener("click", function () {
             headerRow.innerHTML += "<img src=\"" + ICON + "/" + current.weather[0].icon + ".png\" alt=\"" + current.weather[0].description + "\">";
             for (var i = 0; i < cards.length; i++) {
                 var currentCard = dailyWeather[i + 1];
-                cards[i].innerHTML = "\n\t\t\t\t\t\t\t<div class=\"forecast-date\">" + toDateString(currentCard.dt) + "</div>\n\t\t\t\t\t\t\t<img src=\"" + ICON + "/" + currentCard.weather[0].icon + ".png\" alt=\"" + current.weather[0].description + "\">\n\t\t\t\t\t\t\t<div>Temp: " + currentCard.temp.day + " \u00B0F</div>\n\t\t\t\t\t\t\t<div>Humidity: " + currentCard.humidity + "%</div>\n\t\t\t\t\t\t";
+                cards[i].innerHTML = "\n\t\t\t\t\t\t\t<div class=\"forecast-date\">" + toDateString(currentCard.dt) + "</div>\n\t\t\t\t\t\t\t<img src=\"" + ICON + "/" + currentCard.weather[0].icon + ".png\" alt=\"" + currentCard.weather[0].description + "\">\n\t\t\t\t\t\t\t<div>Temp: " + currentCard.temp.day + " \u00B0F</div>\n\t\t\t\t\t\t\t<div>Humidity: " + currentCard.humidity + "%</div>\n\t\t\t\t\t\t";
             }
         });
     });
 });
+/**
+ * Load the page
+ */
+renderSearchHistory();
