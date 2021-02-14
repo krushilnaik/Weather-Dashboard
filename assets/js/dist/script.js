@@ -49,14 +49,10 @@ searchButton.addEventListener("click", function () {
     // and pass those into the "main" fetch
     fetch(WEATHER + "&q=" + query).then(function (response) { return response.json(); }).then(function (data) {
         cityName = data.name;
-        var searchHistoryString = localStorage.getItem("searchHistory");
-        if (searchHistoryString) {
-            searchHistoryString += "|" + cityName;
-        }
-        else {
-            searchHistoryString = cityName;
-        }
-        localStorage.setItem("searchHistory", searchHistoryString);
+        var searchHistoryString = localStorage.getItem("searchHistory") || "";
+        var historySet = new Set(searchHistoryString.split("|").reverse().filter(function (_str) { return _str.trim().length !== 0; }));
+        historySet.add(cityName);
+        localStorage.setItem("searchHistory", Array.from(historySet).join("|"));
         renderSearchHistory();
         return [data.coord.lat, data.coord.lon];
     }).then(function (coords) {

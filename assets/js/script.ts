@@ -78,15 +78,12 @@ searchButton.addEventListener("click", function() {
 		data => {
 			cityName = data.name;
 
-			var searchHistoryString = localStorage.getItem("searchHistory");
+			var searchHistoryString = localStorage.getItem("searchHistory") || "";
 
-			if (searchHistoryString) {
-				searchHistoryString += "|" + cityName;
-			} else {
-				searchHistoryString = cityName;
-			}
+			var historySet = new Set(searchHistoryString.split("|").reverse().filter(_str => _str.trim().length !== 0));
+			historySet.add(cityName);
 
-			localStorage.setItem("searchHistory", searchHistoryString);
+			localStorage.setItem("searchHistory", Array.from(historySet).join("|"));
 
 			renderSearchHistory();
 
