@@ -97,7 +97,7 @@ searchButton.addEventListener("click", function() {
 
 						cards[i].innerHTML = `
 							<div class="forecast-date">${toDateString(currentCard.dt)}</div>
-							<img src="${ICON}/${currentCard.weather[0].icon}.png" alt="${current.weather[0].description}">
+							<img src="${ICON}/${currentCard.weather[0].icon}.png" alt="${currentCard.weather[0].description}">
 							<div>Temp: ${currentCard.temp.day} °F</div>
 							<div>Humidity: ${currentCard.humidity}%</div>
 						`;
