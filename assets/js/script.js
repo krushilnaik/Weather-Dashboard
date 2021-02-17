@@ -25,36 +25,7 @@ function toDateString(unixTime) {
 	return (new Date(unixTime * 1000)).toLocaleDateString();
 }
 
-/**
- * Build a list of cities the user has previous searched for
- * and put then on the left side of the screen, under the search bar
- */
-function renderSearchHistory() {
-	searchHistoryElement.innerHTML = "";
-	const searchHistoryString = localStorage.getItem("searchHistory");
-
-	if (searchHistoryString === null) {
-		return;
-	}
-
-	for (const city of searchHistoryString.split("|").reverse()) {
-		if (city === "undefined") {
-			continue;
-		}
-
-		let entry = document.createElement("div");
-		entry.className = "history-item";
-		entry.innerText = city;
-
-		searchHistoryElement.appendChild(entry);
-	}
-}
-
-searchButton.addEventListener("click", function() {
-	const query = searchField.value;
-
-	var cityName;
-
+function fetchWeather(query) {
 	// The UV Index is only found in the One Call API
 	// which uses lat and lon instead of city name
 	// for now, fetch those separately via arbitrary API
@@ -86,7 +57,6 @@ searchButton.addEventListener("click", function() {
 					// set up an expected structure for the parsed JSON
 					// solely for better code completion
 					// let _data: ResponseModel = data;
-
 					const uvColors = {
 						"8-10" : "violet",
 						"6-8" : "red",
@@ -139,8 +109,41 @@ searchButton.addEventListener("click", function() {
 			)
 		}
 	);
-});
+}
 
+/**
+ * Build a list of cities the user has previous searched for
+ * and put then on the left side of the screen, under the search bar
+ */
+function renderSearchHistory() {
+	searchHistoryElement.innerHTML = "";
+	const searchHistoryString = localStorage.getItem("searchHistory");
+
+	if (searchHistoryString === null) {
+		return;
+	}
+
+	for (const city of searchHistoryString.split("|").reverse()) {
+		if (city === "undefined") {
+			continue;
+		}
+
+		let entry = document.createElement("button");
+		entry.className = "history-item";
+		entry.innerText = city;
+		entry.addEventListener("click", function() {
+			fetchWeather(city);
+		})
+
+		searchHistoryElement.appendChild(entry);
+	}
+}
+
+searchButton.addEventListener("click", function() {
+	const query = searchField.value;
+
+	fetchWeather(query);
+});
 
 
 /**
