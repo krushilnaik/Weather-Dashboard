@@ -25,6 +25,11 @@ function toDateString(unixTime) {
 	return (new Date(unixTime * 1000)).toLocaleDateString();
 }
 
+/**
+ * Fetch the weather for today (and the five following days)
+ * and render the HTML for it in the DOM
+ * @param {string} query the city name you want to look up
+ */
 function fetchWeather(query) {
 	// The UV Index is only found in the One Call API
 	// which uses lat and lon instead of city name
@@ -54,9 +59,6 @@ function fetchWeather(query) {
 				response => response.json()
 			).then(
 				data => {
-					// set up an expected structure for the parsed JSON
-					// solely for better code completion
-					// let _data: ResponseModel = data;
 					const uvColors = {
 						"8-10" : "violet",
 						"6-8" : "red",
